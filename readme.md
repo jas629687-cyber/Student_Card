@@ -1,16 +1,67 @@
-# React + Vite
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+# UniCard – Smart Student Identity Card System
 
-Currently, two official plugins are available:
+## 1. Project Overview
+UniCard is a digital student identity card management system.
+It provides students with a modern digital ID card containing
+their personal details, department, student ID and QR code.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+The system uses reusable React components to display
+student cards with a consistent design.
 
-## React Compiler
+## 2. Objectives
+- Create digital student identity cards.
+- Display student information clearly.
+- Generate QR codes for student verification.
+- Display student activity status.
+- Reuse components for multiple student cards.
+- Provide a simple and user-friendly interface.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 3. Features
+- Digital Student ID Card
+- Student Profile
+- QR Code Verification
+- Attendance Status
+- Student Dashboard
+- Reusable UI Components
 
-## Expanding the ESLint configuration
+## 4. Technology Stack
+- HTML
+- CSS
+- JavaScript
+- React.js
+- Vite
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## 5. Project Structure
+- components – Reusable UI components
+- pages – Application pages
+- assets – Images and other resources
+- App.jsx – Main application component
+- App.css – Application styling
+
+## 6. How to Run
+
+1. Install Node.js.
+2. Open the project in VS Code.
+3. Open the terminal.
+4. Install dependencies:
+
+   npm install
+
+5. Start the development server:
+
+   npm run dev
+
+6. Open the local URL in your browser.
+
+## 7. Future Enhancements
+- Add new student details.
+- Edit and delete student records.
+- Search students by ID.
+- Attendance management.
+- Student login and authentication.
+- Database integration.
+
+## 8. Project Goal
+To create a simple, modern and reusable digital
+student identity card system.

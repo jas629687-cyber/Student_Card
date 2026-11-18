@@ -1,19 +1,42 @@
 
-import { Search } from "lucide-react";
+function Sidebar({ activePage, setActivePage }) {
+  const menuItems = [
+    "Dashboard",
+    "Students",
+    "ID Cards",
+    "Attendance",
+    "Settings"
+  ];
 
-function SearchBar({ search, setSearch }) {
   return (
-    <div className="search-box">
-      <Search size={20} />
+    <aside className="sidebar">
+      <div className="brand">
+        <span>🎓</span>
+        <h2>UniCard</h2>
+      </div>
 
-      <input
-        type="text"
-        placeholder="Search by student name or ID..."
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-      />
-    </div>
+      <p className="menu-label">MAIN MENU</p>
+
+      <nav>
+        {menuItems.map((item) => (
+          <button
+            key={item}
+            className={`menu-item ${
+              activePage === item ? "active" : ""
+            }`}
+            onClick={() => setActivePage(item)}
+          >
+            {item}
+          </button>
+        ))}
+      </nav>
+
+      <div className="sidebar-footer">
+        <p>UniCard Management</p>
+        <small>Version 2.0</small>
+      </div>
+    </aside>
   );
 }
 
-export default SearchBar;
+export default Sidebar;

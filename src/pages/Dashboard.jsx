@@ -1,19 +1,14 @@
 
 import { useState } from "react";
-import {
-  Users,
-  UserCheck,
-  CreditCard,
-  GraduationCap
-} from "lucide-react";
 
-import Sidebar from "../components/Sidebar";
-import Navbar from "../components/Navbar";
-import StatsCard from "../components/StatsCard";
-import SearchBar from "../components/Searchbar";
-import StudentCard from "../components/StudentCard";
+import Sidebar from "../components/Sidebar.jsx";
+import Navbar from "../components/Navbar.jsx";
+import StatsCard from "../components/StatsCard.jsx";
+import SearchBar from "../components/SearchBar.jsx";
+import StudentCard from "../components/StudentCard.jsx";
 
 function Dashboard() {
+
   const [activePage, setActivePage] = useState("Dashboard");
   const [search, setSearch] = useState("");
   const [department, setDepartment] = useState("All");
@@ -53,11 +48,14 @@ function Dashboard() {
     }
   ]);
 
+  // Count active students
   const activeStudents = students.filter(
     (student) => student.status === "Active"
   ).length;
 
+  // Search and department filtering
   const filteredStudents = students.filter((student) => {
+
     const matchesSearch =
       student.name.toLowerCase().includes(search.toLowerCase()) ||
       student.id.toLowerCase().includes(search.toLowerCase());
@@ -69,31 +67,45 @@ function Dashboard() {
     return matchesSearch && matchesDepartment;
   });
 
+  const departments = [
+    ...new Set(students.map((student) => student.department))
+  ];
+
   return (
     <div className="app-layout">
+
       <Sidebar
         activePage={activePage}
         setActivePage={setActivePage}
       />
 
       <main className="main-content">
+
         <Navbar />
 
         <section className="dashboard-content">
+
+          {/* Welcome section */}
+
           <div className="welcome-section">
             <div>
               <h1>Welcome to UniCard 👋</h1>
-              <p>Here's your student management overview.</p>
+              <p>Manage your student identity cards easily.</p>
             </div>
 
-            <span className="date-label">ACADEMIC YEAR 2026–27</span>
+            <span className="date-label">
+              ACADEMIC YEAR 2026-27
+            </span>
           </div>
 
+          {/* Statistics */}
+
           <div className="stats-grid">
+
             <StatsCard
               title="Total Students"
               value={students.length}
-              icon={Users}
+              icon="👨‍🎓"
               color="blue"
               description="Registered students"
             />
@@ -101,7 +113,7 @@ function Dashboard() {
             <StatsCard
               title="Active Students"
               value={activeStudents}
-              icon={UserCheck}
+              icon="✅"
               color="green"
               description="Currently active"
             />
@@ -109,21 +121,25 @@ function Dashboard() {
             <StatsCard
               title="ID Cards"
               value={students.length}
-              icon={CreditCard}
+              icon="🪪"
               color="purple"
-              description="Student cards created"
+              description="Cards generated"
             />
 
             <StatsCard
               title="Departments"
-              value={new Set(students.map(s => s.department)).size}
-              icon={GraduationCap}
+              value={departments.length}
+              icon="🏫"
               color="orange"
-              description="Departments represented"
+              description="Departments available"
             />
+
           </div>
 
+          {/* Student section */}
+
           <section className="students-section">
+
             <div className="section-heading">
               <div>
                 <h2>Student ID Cards</h2>
@@ -135,7 +151,10 @@ function Dashboard() {
               </span>
             </div>
 
+            {/* Search and filter */}
+
             <div className="filter-row">
+
               <SearchBar
                 search={search}
                 setSearch={setSearch}
@@ -146,31 +165,47 @@ function Dashboard() {
                 onChange={(e) => setDepartment(e.target.value)}
               >
                 <option value="All">All Departments</option>
-                <option value="CSE - AI & ML">CSE - AI & ML</option>
-                <option value="CSE">CSE</option>
-                <option value="IT">IT</option>
+
+                {departments.map((dept) => (
+                  <option key={dept} value={dept}>
+                    {dept}
+                  </option>
+                ))}
+
               </select>
+
             </div>
 
+            {/* Student cards */}
+
             <div className="card-container">
+
               {filteredStudents.length > 0 ? (
+
                 filteredStudents.map((student) => (
                   <StudentCard
                     key={student.id}
                     student={student}
                   />
                 ))
+
               ) : (
+
                 <div className="empty-state">
-                  <Users size={40} />
-                  <h3>No students found</h3>
-                  <p>Try another name, ID or department.</p>
+                  <h3>🔍 No Students Found</h3>
+                  <p>Try searching with another name or ID.</p>
                 </div>
+
               )}
+
             </div>
+
           </section>
+
         </section>
+
       </main>
+
     </div>
   );
 }
