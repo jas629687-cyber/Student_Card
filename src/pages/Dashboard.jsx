@@ -1,211 +1,386 @@
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import {
+  Users,
+  UserCheck,
+  UserX,
+  Plus,
+  Search,
+  Pencil,
+  Trash2,
+  X,
+} from "lucide-react";
 
-import Sidebar from "../components/Sidebar.jsx";
-import Navbar from "../components/Navbar.jsx";
-import StatsCard from "../components/StatsCard.jsx";
-import SearchBar from "../components/SearchBar.jsx";
-import StudentCard from "../components/StudentCard.jsx";
+const initialStudents = [
+  {
+    id: "UC001",
+    name: "Arun Kumar",
+    email: "arun@gmail.com",
+    department: "CSE",
+    year: "3rd Year",
+    status: "Active",
+  },
+  {
+    id: "UC002",
+    name: "Priya Sharma",
+    email: "priya@gmail.com",
+    department: "AIML",
+    year: "2nd Year",
+    status: "Active",
+  },
+  {
+    id: "UC003",
+    name: "Rahul Kumar",
+    email: "rahul@gmail.com",
+    department: "IT",
+    year: "3rd Year",
+    status: "Inactive",
+  },
+];
 
 function Dashboard() {
+  const [students, setStudents] = useState(() => {
+    try {
+      const saved = localStorage.getItem("unicard_students");
+      return saved ? JSON.parse(saved) : initialStudents;
+    } catch {
+      return initialStudents;
+    }
+  });
 
-  const [activePage, setActivePage] = useState("Dashboard");
   const [search, setSearch] = useState("");
   const [department, setDepartment] = useState("All");
+  const [showForm, setShowForm] = useState(false);
+  const [editingId, setEditingId] = useState(null);
 
-  const [students] = useState([
-    {
-      name: "Jasmine V",
-      id: "AIML001",
-      department: "CSE - AI & ML",
-      year: "III Year",
-      status: "Active",
-      photo: "https://i.pravatar.cc/150?img=47"
-    },
-    {
-      name: "Harini",
-      id: "AIML002",
-      department: "CSE - AI & ML",
-      year: "III Year",
-      status: "Active",
-      photo: "https://i.pravatar.cc/150?img=44"
-    },
-    {
-      name: "Priya",
-      id: "CSE003",
-      department: "CSE",
-      year: "II Year",
-      status: "Active",
-      photo: "https://i.pravatar.cc/150?img=45"
-    },
-    {
-      name: "Rahul",
-      id: "IT004",
-      department: "IT",
-      year: "III Year",
-      status: "Inactive",
-      photo: "https://i.pravatar.cc/150?img=12"
-    }
-  ]);
+  const emptyForm = {
+    name: "",
+    email: "",
+    department: "CSE",
+    year: "1st Year",
+    status: "Active",
+  };
 
-  // Count active students
-  const activeStudents = students.filter(
+  const [form, setForm] = useState(emptyForm);
+
+  useEffect(() => {
+    localStorage.setItem("unicard_students", JSON.stringify(students));
+  }, [students]);
+
+  const activeCount = students.filter(
     (student) => student.status === "Active"
   ).length;
 
-  // Search and department filtering
-  const filteredStudents = students.filter((student) => {
+  const inactiveCount = students.length - activeCount;
 
+  const filteredStudents = students.filter((student) => {
     const matchesSearch =
       student.name.toLowerCase().includes(search.toLowerCase()) ||
-      student.id.toLowerCase().includes(search.toLowerCase());
+      student.id.toLowerCase().includes(search.toLowerCase()) ||
+      student.email.toLowerCase().includes(search.toLowerCase());
 
     const matchesDepartment =
-      department === "All" ||
-      student.department === department;
+      department === "All" || student.department === department;
 
     return matchesSearch && matchesDepartment;
   });
 
-  const departments = [
-    ...new Set(students.map((student) => student.department))
-  ];
+  function openAddForm() {
+    setEditingId(null);
+    setForm(emptyForm);
+    setShowForm(true);
+  }
+
+  function openEditForm(student) {
+    setEditingId(student.id);
+    setForm({
+      name: student.name,
+      email: student.email,
+      department: student.department,
+      year: student.year,
+      status: student.status,
+    });
+    setShowForm(true);
+  }
+
+  function handleSubmit(event) {
+    event.preventDefault();
+
+    if (editingId) {
+      setStudents((current) =>
+        current.map((student) =>
+          student.id === editingId
+            ? { ...student, ...form }
+            : student
+        )
+      );
+    } else {
+      const newStudent = {
+        id: `UC${Date.now().toString().slice(-6)}`,
+        ...form,
+      };
+
+      setStudents((current) => [newStudent, ...current]);
+    }
+
+    setShowForm(false);
+    setForm(emptyForm);
+    setEditingId(null);
+  }
+
+  function deleteStudent(id) {
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this student?"
+    );
+
+    if (confirmed) {
+      setStudents((current) =>
+        current.filter((student) => student.id !== id)
+      );
+    }
+  }
 
   return (
-    <div className="app-layout">
+    <div className="dashboard">
+      <div className="stats-grid">
+        <div className="stat-card">
+          <div className="stat-icon blue"><Users /></div>
+          <div>
+            <p>Total Students</p>
+            <h2>{students.length}</h2>
+          </div>
+        </div>
 
-      <Sidebar
-        activePage={activePage}
-        setActivePage={setActivePage}
-      />
+        <div className="stat-card">
+          <div className="stat-icon green"><UserCheck /></div>
+          <div>
+            <p>Active Students</p>
+            <h2>{activeCount}</h2>
+          </div>
+        </div>
 
-      <main className="main-content">
+        <div className="stat-card">
+          <div className="stat-icon red"><UserX /></div>
+          <div>
+            <p>Inactive Students</p>
+            <h2>{inactiveCount}</h2>
+          </div>
+        </div>
+      </div>
 
-        <Navbar />
-
-        <section className="dashboard-content">
-
-          {/* Welcome section */}
-
-          <div className="welcome-section">
-            <div>
-              <h1>Welcome to UniCard 👋</h1>
-              <p>Manage your student identity cards easily.</p>
-            </div>
-
-            <span className="date-label">
-              ACADEMIC YEAR 2026-27
-            </span>
+      <section className="student-section">
+        <div className="section-heading">
+          <div>
+            <h2>Student Management</h2>
+            <p>Manage and organize your student records.</p>
           </div>
 
-          {/* Statistics */}
+          <button className="add-btn" onClick={openAddForm}>
+            <Plus size={18} />
+            Add Student
+          </button>
+        </div>
 
-          <div className="stats-grid">
-
-            <StatsCard
-              title="Total Students"
-              value={students.length}
-              icon="👨‍🎓"
-              color="blue"
-              description="Registered students"
+        <div className="student-toolbar">
+          <div className="search-box">
+            <Search size={18} />
+            <input
+              type="text"
+              placeholder="Search name, ID or email..."
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
             />
-
-            <StatsCard
-              title="Active Students"
-              value={activeStudents}
-              icon="✅"
-              color="green"
-              description="Currently active"
-            />
-
-            <StatsCard
-              title="ID Cards"
-              value={students.length}
-              icon="🪪"
-              color="purple"
-              description="Cards generated"
-            />
-
-            <StatsCard
-              title="Departments"
-              value={departments.length}
-              icon="🏫"
-              color="orange"
-              description="Departments available"
-            />
-
           </div>
 
-          {/* Student section */}
+          <select
+            value={department}
+            onChange={(event) => setDepartment(event.target.value)}
+          >
+            <option value="All">All Departments</option>
+            <option value="CSE">CSE</option>
+            <option value="AIML">AIML</option>
+            <option value="IT">IT</option>
+            <option value="ECE">ECE</option>
+            <option value="EEE">EEE</option>
+          </select>
+        </div>
 
-          <section className="students-section">
+        <div className="table-wrapper">
+          <table className="student-table">
+            <thead>
+              <tr>
+                <th>Student</th>
+                <th>Student ID</th>
+                <th>Department</th>
+                <th>Year</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
 
-            <div className="section-heading">
+            <tbody>
+              {filteredStudents.map((student) => (
+                <tr key={student.id}>
+                  <td>
+                    <div className="student-name-cell">
+                      <div className="student-avatar">
+                        {student.name.charAt(0).toUpperCase()}
+                      </div>
+                      <div>
+                        <strong>{student.name}</strong>
+                        <span>{student.email}</span>
+                      </div>
+                    </div>
+                  </td>
+
+                  <td>{student.id}</td>
+                  <td>{student.department}</td>
+                  <td>{student.year}</td>
+
+                  <td>
+                    <span
+                      className={`status-badge ${
+                        student.status === "Active"
+                          ? "status-active"
+                          : "status-inactive"
+                      }`}
+                    >
+                      {student.status}
+                    </span>
+                  </td>
+
+                  <td>
+                    <div className="action-buttons">
+                      <button
+                        className="edit-btn"
+                        title="Edit student"
+                        onClick={() => openEditForm(student)}
+                      >
+                        <Pencil size={17} />
+                      </button>
+
+                      <button
+                        className="delete-btn"
+                        title="Delete student"
+                        onClick={() => deleteStudent(student.id)}
+                      >
+                        <Trash2 size={17} />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+
+              {filteredStudents.length === 0 && (
+                <tr>
+                  <td colSpan="6" className="empty-message">
+                    No students found.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        <p className="table-footer">
+          Showing {filteredStudents.length} of {students.length} students
+        </p>
+      </section>
+
+      {showForm && (
+        <div className="modal-overlay">
+          <div className="student-modal">
+            <div className="modal-heading">
               <div>
-                <h2>Student ID Cards</h2>
-                <p>View and manage student identity cards.</p>
+                <h2>{editingId ? "Edit Student" : "Add New Student"}</h2>
+                <p>Enter the student information below.</p>
               </div>
 
-              <span className="student-count">
-                {filteredStudents.length} Students
-              </span>
+              <button
+                className="close-btn"
+                onClick={() => setShowForm(false)}
+              >
+                <X />
+              </button>
             </div>
 
-            {/* Search and filter */}
-
-            <div className="filter-row">
-
-              <SearchBar
-                search={search}
-                setSearch={setSearch}
+            <form onSubmit={handleSubmit}>
+              <label>Full Name</label>
+              <input
+                required
+                value={form.name}
+                placeholder="Enter student name"
+                onChange={(event) =>
+                  setForm({ ...form, name: event.target.value })
+                }
               />
 
+              <label>Email Address</label>
+              <input
+                required
+                type="email"
+                value={form.email}
+                placeholder="Enter email address"
+                onChange={(event) =>
+                  setForm({ ...form, email: event.target.value })
+                }
+              />
+
+              <label>Department</label>
               <select
-                value={department}
-                onChange={(e) => setDepartment(e.target.value)}
+                value={form.department}
+                onChange={(event) =>
+                  setForm({ ...form, department: event.target.value })
+                }
               >
-                <option value="All">All Departments</option>
-
-                {departments.map((dept) => (
-                  <option key={dept} value={dept}>
-                    {dept}
-                  </option>
-                ))}
-
+                <option>CSE</option>
+                <option>AIML</option>
+                <option>IT</option>
+                <option>ECE</option>
+                <option>EEE</option>
               </select>
 
-            </div>
+              <label>Academic Year</label>
+              <select
+                value={form.year}
+                onChange={(event) =>
+                  setForm({ ...form, year: event.target.value })
+                }
+              >
+                <option>1st Year</option>
+                <option>2nd Year</option>
+                <option>3rd Year</option>
+                <option>4th Year</option>
+              </select>
 
-            {/* Student cards */}
+              <label>Status</label>
+              <select
+                value={form.status}
+                onChange={(event) =>
+                  setForm({ ...form, status: event.target.value })
+                }
+              >
+                <option>Active</option>
+                <option>Inactive</option>
+              </select>
 
-            <div className="card-container">
+              <div className="modal-actions">
+                <button
+                  type="button"
+                  className="cancel-btn"
+                  onClick={() => setShowForm(false)}
+                >
+                  Cancel
+                </button>
 
-              {filteredStudents.length > 0 ? (
-
-                filteredStudents.map((student) => (
-                  <StudentCard
-                    key={student.id}
-                    student={student}
-                  />
-                ))
-
-              ) : (
-
-                <div className="empty-state">
-                  <h3>🔍 No Students Found</h3>
-                  <p>Try searching with another name or ID.</p>
-                </div>
-
-              )}
-
-            </div>
-
-          </section>
-
-        </section>
-
-      </main>
-
+                <button type="submit" className="add-btn">
+                  {editingId ? "Save Changes" : "Add Student"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

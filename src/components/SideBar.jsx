@@ -1,40 +1,84 @@
 
+import {
+  LayoutDashboard,
+  Users,
+  CreditCard,
+  CalendarCheck,
+  Settings,
+  GraduationCap,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
+
+import { useState } from "react";
+
 function Sidebar({ activePage, setActivePage }) {
+  const [collapsed, setCollapsed] = useState(false);
+
   const menuItems = [
-    "Dashboard",
-    "Students",
-    "ID Cards",
-    "Attendance",
-    "Settings"
+    { name: "Dashboard", icon: LayoutDashboard },
+    { name: "Students", icon: Users },
+    { name: "ID Cards", icon: CreditCard },
+    { name: "Attendance", icon: CalendarCheck },
+    { name: "Settings", icon: Settings },
   ];
 
   return (
-    <aside className="sidebar">
-      <div className="brand">
-        <span>🎓</span>
-        <h2>UniCard</h2>
+    <aside className={`sidebar ${collapsed ? "collapsed" : ""}`}>
+      <div className="sidebar-brand">
+        <div className="brand-icon">
+          <GraduationCap size={26} />
+        </div>
+
+        {!collapsed && (
+          <div>
+            <h2>UniCard</h2>
+            <span>Student Management</span>
+          </div>
+        )}
       </div>
 
-      <p className="menu-label">MAIN MENU</p>
+      <button
+        className="collapse-btn"
+        onClick={() => setCollapsed(!collapsed)}
+        title="Toggle sidebar"
+      >
+        {collapsed ? <ChevronRight /> : <ChevronLeft />}
+      </button>
 
-      <nav>
-        {menuItems.map((item) => (
-          <button
-            key={item}
-            className={`menu-item ${
-              activePage === item ? "active" : ""
-            }`}
-            onClick={() => setActivePage(item)}
-          >
-            {item}
-          </button>
-        ))}
+      <p className="menu-label">
+        {!collapsed && "MAIN MENU"}
+      </p>
+
+      <nav className="sidebar-menu">
+        {menuItems.map((item) => {
+          const Icon = item.icon;
+
+          return (
+            <button
+              key={item.name}
+              className={`menu-item ${
+                activePage === item.name ? "active" : ""
+              }`}
+              onClick={() => setActivePage(item.name)}
+              title={collapsed ? item.name : ""}
+            >
+              <Icon size={20} />
+              {!collapsed && <span>{item.name}</span>}
+            </button>
+          );
+        })}
       </nav>
 
-      <div className="sidebar-footer">
-        <p>UniCard Management</p>
-        <small>Version 2.0</small>
-      </div>
+      {!collapsed && (
+        <div className="sidebar-footer">
+          <div className="footer-avatar">A</div>
+          <div>
+            <strong>Admin User</strong>
+            <span>Administrator</span>
+          </div>
+        </div>
+      )}
     </aside>
   );
 }
